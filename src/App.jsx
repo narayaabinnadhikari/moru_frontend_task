@@ -1,49 +1,48 @@
 import { useEffect, useState } from 'react'
-import './App.css'
-import Header from './components/Header';
-import Footer from './components/Footer';
+import Footer from './Footer';
+import apiRequest from './apiRequest';
+import Form from './Form';
+// import List from './List';
+import Table from './Table';
 
 function App() {
  const API_URL = `https://jsonplaceholder.typicode.com`
 
- const [posts, setPosts] = useState([]);
- const [err, setErr] = useState(null);
- const [isLoading, setIsLoading] = useState(true);
+ const [reqType, setReqType] = useState('users');
+ const [items, setItems] = useState([]);
 
  useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchItems = async () => {
       try {
-        const response = await fetch(`${API_URL}/posts`);
-        if (!response.ok) {
-          throw new Error('Not returning data');
-        }
+        const response = await fetch(`${API_URL}/${reqType}`);
         const data = await response.json();
-        setPosts(data);
-        setErr(null);
+        console.log(data);
+        setItems(data);
       } catch (error) {
-        setErr(error.message);
-      } finally {
-        setIsLoading(false);
-      }
+        console.log(error)
+      } 
     }
-    setTimeout(() => {
-    fetchPosts() }, 1000);
- }, [])
+    fetchItems();
+ }, [reqType])
+
+// {
+
+//   const postOptions = {
+//     method: 'POST',
+//     header: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify(myNewItem)
+//   }
+//   const result = await apiRequest(API_URL,postOptions);
+//   if(result) setFetchError(result);
+// }
+
   return (
     <>
-      <Header />
-        {isLoading && <h3>Waiting for Data ....</h3>}
-        {err && <h3 style={{color: "red"}}>{ `Sorry: ${err}` }</h3>}
-        {!err && !isLoading &&
-      <main className='min-h-screen bg-gray-100'>
-        <h1>Posts</h1>
-        <ul>
-          {posts.map((post) => (
-            <li key={post.id}>{post.title}</li>
-          ))} 
-        </ul>
-      </main>
-        }
+        <Form reqType={reqType} setReqType={setReqType} />
+        {/* <List items={items} /> */}
+        <Table items={items} />
       <Footer />
     </>
   )
